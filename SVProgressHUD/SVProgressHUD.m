@@ -54,6 +54,7 @@ CGFloat SVProgressHUDRingThickness = 6;
 - (UIColor *)hudForegroundColor;
 - (UIColor *)hudStatusShadowColor;
 - (UIFont *)hudFont;
+- (NSTimeInterval)hudDismissDuration;
 #endif
 
 @end
@@ -67,6 +68,7 @@ CGFloat SVProgressHUDRingThickness = 6;
 @synthesize hudForegroundColor = _uiHudFgColor;
 @synthesize hudStatusShadowColor = _uiHudStatusShColor;
 @synthesize hudFont = _uiHudFont;
+@synthesize hudDismissDuration = _uiHudDismissDuration;
 #endif
 
 
@@ -123,7 +125,10 @@ CGFloat SVProgressHUDRingThickness = 6;
 }
 
 + (void)showImage:(UIImage *)image status:(NSString *)string {
-    NSTimeInterval displayInterval = [[SVProgressHUD sharedView] displayDurationForString:string];
+    NSTimeInterval displayInterval = [SVProgressHUD sharedView].hudDismissDuration;
+    if (displayInterval == 0.0) {
+        displayInterval = [[SVProgressHUD sharedView] displayDurationForString:string];
+    }
     [[SVProgressHUD sharedView] showImage:image status:string duration:displayInterval];
 }
 
@@ -769,6 +774,17 @@ CGFloat SVProgressHUDRingThickness = 6;
 #endif
     
     return [UIFont boldSystemFontOfSize:16];
+}
+
+- (NSTimeInterval)hudDismissDuration {
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 50000
+  if(_uiHudDismissDuration == 0.0) {
+    _uiHudDismissDuration = [[[self class] appearance] hudDismissDuration];
+  }
+  
+  return _uiHudDismissDuration;
+#endif
+  return 0.0;
 }
 
 @end
